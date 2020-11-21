@@ -104,5 +104,5 @@ class PdfProcess:
         """
         self.path_dir = path_dir
         # 睡眠状态分为5个时期分别为：W, S1, S2, S3, R 这5个状态，对应的的标签分别为 0-4
-        self.sleepState = {"W": 0, "S1": 1, "S2": 2, "S3": 3, "R": 4}
+        self.sleepState = {"W": 0, "S1": 1, "S2": 2, "S3": 3, "S4": 4, "R": 5}
         # self.create_split_data()  # 根据默认的参数来生成切片的数据
