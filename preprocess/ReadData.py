@@ -94,7 +94,8 @@ class PdfProcess:
                 # 获得了数据的切片
                 split_data, _ = data[:, start_time_file * downsampling: (start_time_file + epoch) * downsampling]
                 # 设置数据的存储目录
-                name = "{}_{}_{}.{}".format(uuid.uuid1(), t, s, "npy")  # 命名规则：uuid+时间+状态+后缀
+                file_name = os.path.basename(path_data).split('.')[0]
+                name = "{}_{}_{}_{}.{}".format(uuid.uuid1(), file_name, t, s, "npy")  # 命名规则：uuid+文件+时间+状态+后缀
                 save_split_data_path = os.path.join(sleep_state_path[s], name)  # 完整的路基表示
                 save_numpy_info(split_data, save_split_data_path)  # 写入到本地的磁盘中
 
