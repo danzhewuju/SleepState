@@ -132,9 +132,7 @@ class MyData:
         max_shape = data[0][0].shape
         labels = []  # 每个数据对应的标签
         length = []  # 记录真实的数目长度
-        domains = []
-        ids = []  # 记录序列的 id
-        for i, (d, patient, id_, label) in enumerate(data):
+        for i, (d, label) in enumerate(data):
             reshape = d.shape
             length.append(d.shape[-1])
             if reshape[-1] < max_shape[-1]:
@@ -144,10 +142,8 @@ class MyData:
                 data[i] = d
 
             labels.append(label)
-            domains.append(patient)
-            ids.append(id_)
 
-        return torch.from_numpy(np.array(data)), torch.tensor(labels), torch.tensor(domains), torch.tensor(length), ids
+        return torch.from_numpy(np.array(data)), torch.tensor(labels)
 
     def data_loader(self, transform, mode='train'):  # 这里只有两个模式，一个是train/一个是test
         dataloader = None
@@ -160,12 +156,12 @@ class MyData:
             # 因为样本的数目不均衡，需要进行不均衡采样
             # 需要计算每一个样本的权重值
 
-            dataloader = DataLoader(dataset, shuffle=True, batch_size=self.batch_size)
+            dataloader = DataLoader(dataset, shuffle=True, batch_size=self.batch_size, collate_fn=self.collate_fn)
 
         elif mode == 'test':  # test
             data_info = DataInfo(self.path_test)
             dataset = MyDataset(data_info.data, transform=transform)
-            dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+            dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collate_fn)
         else:
             pass
 
@@ -174,5 +170,6 @@ class MyData:
     def next_batch_val_data(self, transform):
         data_info = DataInfo(self.path_val)
         dataset = MyDataset(next(data_info.next_batch_data(self.batch_size)), transform=transform)
-        next_batch_data_loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        next_batch_data_loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True,
+                                            collate_fn=self.collate_fn)
         yield next_batch_data_loader
