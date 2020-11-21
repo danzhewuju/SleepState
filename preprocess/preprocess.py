@@ -6,14 +6,17 @@
 # @File    : preprocess.py
 # @Software: PyCharm
 
-from util.seeg_utils import *
 import pickle
+
+from util.seeg_utils import *
 
 
 def read_data():
-    path = '../dataset/insomnia/ins2.edf.st'
-    data = read_edf_raw(path)
-    print("Yes")
+    for i in range(1, 10):
+        path = '../dataset/insomnia/ins{}.edf'.format(i)
+        data = read_edf_raw(path)
+        print("Start time:" + data.annotations.orig_time.strftime("%H:%M:%S"))
+        print(get_sampling_hz(data))
 
 
 def read_st():
@@ -22,4 +25,4 @@ def read_st():
     print("yes")
 
 
-read_st()
+read_data()
