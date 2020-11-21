@@ -66,12 +66,18 @@ def matrix_normalization(data, resize_shape=(130, -1)):
             扩大原来的矩阵
             '''
             d = resize_shape[0] - data_shape[0]
-            channels_add = random.sample(range(1, data_shape[0] - 1), d)
-            fake_channel = []  # 添加信道列表的值
-            for c in channels_add:
-                tmp = (data[c - 1] + data[c]) * 1.0 / 2
-                fake_channel.append(tmp)
-            data = np.insert(data, channels_add, fake_channel, axis=0)
+            while d > 0:
+                ch_no = random.randint(1, data.shape[0] - 2)
+                tmp = (data[ch_no - 1] + data[ch_no + 1]) * 1.0 / 2
+                data = np.insert(data, ch_no, tmp, axis=0)
+                d -= 1
+
+            # channels_add = random.sample(range(1, data_shape[0] - 1), d)
+            # fake_channel = []  # 添加信道列表的值
+            # for c in channels_add:
+            #     tmp = (data[c - 1] + data[c]) * 1.0 / 2
+            #     fake_channel.append(tmp)
+            # data = np.insert(data, channels_add, fake_channel, axis=0)
         else:
             if resize_shape[0] < data_shape[0]:  # 做删除处理
                 '''

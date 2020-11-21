@@ -20,8 +20,9 @@ def set_parser():
 def run():
     arg = set_parser().parse_args()
     pdfProcess = PdfProcess('../dataset/insomnia')
-    op = {'dataSplit': partial(pdfProcess.create_split_data)}  # 设置操作的集合
-    op[arg.dataProcessing]('../dataset/preprocessedData', epoch=30, downsampling=128)
+    op = {'dataSplit': partial(pdfProcess.create_split_data),
+          'createDataset': partial(pdfProcess.create_data_set)}  # 设置操作的集合
+    op[arg.dataProcessing]()
 
 
 run()
