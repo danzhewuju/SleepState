@@ -82,21 +82,19 @@ class ModelHandel:
         print("Generating log!")
         return
 
-    def evaluation(self, probability, y):
+    def evaluation(self, prey, y):
         '''
         评价指标的计算
         :param y:    实际的结果
         :return:  返回各个指标是的结果
         '''
-        result = {'accuracy': 0, 'precision': 0, 'recall': 0, 'f1score': 0, 'auc': 0, 'far': 0}
-        prey = [1 if x > 0.5 else 0 for x in probability]
+        result = {'accuracy': 0, 'precision': 0, 'recall': 0, 'f1score': 0}
+
         cal = IndicatorCalculation(prey, y)
         result['accuracy'] = cal.get_accuracy()
         result['precision'] = cal.get_precision()
         result['recall'] = cal.get_recall()
         result['f1score'] = cal.get_f1score()
-        result['far'] = cal.get_far()
-        result['auc'] = cal.get_auc(probability, y)
 
         return result
 
@@ -188,18 +186,8 @@ class ModelHandel:
                 # ids_list += ids
                 grand_true += [int(x) for x in y]
                 prediction += [int(x) for x in prey]
-                probability += [float(x) for x in torch.softmax(label_output, dim=1)[:, 1]]
+                # probability += [float(x) for x in torch.softmax(label_output, dim=1)[:, 1]]
         loss_avg = sum(loss) / len(loss)
-        res = self.evaluation(probability, grand_true)
-        message = "Unbalance" if self.unbalance > 1 else "balance"
-
-        result = "{} |Baselins: {}|Patient {}|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} | Precision:" \
-                 "{:.5f}| Recall:{:.5f}| F1score:{:.5f}| AUC:{:.5f} | FAR:{:.5f}".format(message, self.basename,
-                                                                                         self.patient,
-                                                                                         len(acc),
-                                                                                         loss_avg, res['accuracy'],
-                                                                                         res['precision'],
-                                                                                         res['recall'],
-                                                                                         res['f1score'], res['auc'],
-                                                                                         res['far'])
+        accuracy = sum(acc) / len(acc)
+        result = "|Data size:{}| test loss:{:.6f}| Accuracy:{:.5f} ".format(len(acc), loss_avg, accuracy)
         ModelHandel.log_write(result)

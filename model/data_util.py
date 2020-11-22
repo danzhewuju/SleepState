@@ -1,36 +1,15 @@
+import collections
+import math
 import random
 import sys
 
 import numpy as np
 import pandas as pd
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 
 sys.path.append('../')
 from util.util_file import matrix_normalization
 import torch
-
-
-class SingleDataInfo:
-    """
-    单个文件的存储读取，用于验证
-    """
-
-    def __init__(self, data, label, data_length):
-        """
-        :param file_path: 文件的名称
-        :param label:  文件的标签
-        :param data_length: 设置的数据长度
-        """
-        self.dict_label = {"pre_seizure": 1, "non_seizure": 0}
-        self.input = data  # 数据源
-        self.label = self.dict_label[label]  # 数据标签
-        self.resampling = 500  # 系统自带的采样频率
-        length = self.input.shape[-1]  # 数据的长度
-        time_info = []  # 用保存截取数据的时间位置信息
-        for i in range(length // (self.resampling * data_length)):
-            start, end = i * self.resampling * data_length, (i + 1) * self.resampling * data_length
-            time_info.append((start, end))
-        self.time_info = time_info
 
 
 class SingleDataset(Dataset):
@@ -61,13 +40,22 @@ class DataInfo:
     用于模型训练的分段信息
     """
 
+    def mcm(self, num):  # 求最小公倍数
+        minimum = 1
+        for i in num:
+            minimum = int(i) * int(minimum) / math.gcd(int(i), int(minimum))
+        return int(minimum)
+
     def __init__(self, path_data):
         data = pd.read_csv(path_data)
         data_path = data['id'].tolist()
         labels = data['label'].tolist()
         self.data = []
+        self.count = collections.defaultdict(int)
         for i in range(len(data_path)):
             self.data.append((data_path[i], int(labels[i])))
+            self.count[labels[i]] += 1  # 需要计算总数
+        self.weight = self.mcm(self.count.values())
         self.data_length = len(self.data)
 
     def next_batch_data(self, batch_size):  # 用于返回一个batch的数据
@@ -156,7 +144,11 @@ class MyData:
             # 因为样本的数目不均衡，需要进行不均衡采样
             # 需要计算每一个样本的权重值
 
-            dataloader = DataLoader(dataset, shuffle=True, batch_size=self.batch_size, collate_fn=self.collate_fn)
+            weight = [data_info.weight // data_info.count[x[1]] for x in data_info.data]
+            sampler = WeightedRandomSampler(weight, len(dataset), replacement=True)
+
+            dataloader = DataLoader(dataset, sampler=sampler, batch_size=self.batch_size,
+                                    collate_fn=self.collate_fn)
 
         elif mode == 'test':  # test
             data_info = DataInfo(self.path_test)
