@@ -15,7 +15,7 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument('-lr', '--learning_ratio', type=float, default=0.001, help='learning ratio of model')  # 学习率
     parser.add_argument('-dim', '--output_dim', type=int, default=32, help='number of hidden units in encoder')  # 表征长度
-    parser.add_argument('-bs', '--batch_size', type=int, default=32, help='number of bath size')  # 训练size的大小
+    parser.add_argument('-bs', '--batch_size', type=int, default=64, help='number of bath size')  # 训练size的大小
     parser.add_argument('-gpu', '--GPU', type=int, default=0, help='GPU ID')  # GPU编号
     parser.add_argument('-ep', '--epoch', type=int, default=50, help='number of epoch')  # 训练轮次的设置
 
