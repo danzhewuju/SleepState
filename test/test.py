@@ -1,11 +1,14 @@
-import math
+from util.seeg_utils import *
 
+a = [1, 2, 3]
+b = [2, 3, 4]
+c = [3, 4, 5]
+for x, y, z in zip(a, b, c):
+    print(x, y, z)
 
-def mcm(num):
-    minimum = 1
-    for i in num:
-        minimum = int(i) * int(minimum) / math.gcd(int(i), int(minimum))
-    return int(minimum)
+# path = "/data/yh/Python/SleepState/dataset/insomnia/ins1.edf"
+# data = read_edf_raw(path)
+# channels = get_channels_names(data)
+# print(channels)
 
-
-print(mcm([1, 3, 5, 8]))
+# data_cho = select_channel_data_mne(data, "")

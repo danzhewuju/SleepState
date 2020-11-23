@@ -84,8 +84,8 @@ class MyDataset(Dataset):  # 重写dateset的相关类
         # 获得该数据的
         if self.transform_data:
             data = self.transform_data(data)
-        result = matrix_normalization(data, (32, 128))  # 设置输入的格式问题
-        result = result.astype('float32')
+        # result = matrix_normalization(data, (32, 128))  # 设置输入的格式问题，只有在对应二维矩阵的时候才需要
+        result = data.astype('float32')
         result = result[np.newaxis, :]
         # result = trans_data(vae_model, result)
         return result, label

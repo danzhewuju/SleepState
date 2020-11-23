@@ -18,32 +18,32 @@ class RCNN(nn.Module):
         self.gpu = gpu
 
         self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
-            nn.BatchNorm2d(16),
+            nn.Conv1d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm1d(16),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
+            nn.MaxPool1d(kernel_size=2, stride=2))
 
         self.layer2 = nn.Sequential(
-            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2),
-            nn.BatchNorm2d(32),
+            nn.Conv1d(16, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm1d(32),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.MaxPool1d(kernel_size=2, stride=2)
         )
 
         self.layer3 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
-            nn.BatchNorm2d(64),
+            nn.Conv1d(32, 64, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm1d(64),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.MaxPool1d(kernel_size=2, stride=2)
         )
 
         self.layer4 = nn.Sequential(
-            nn.Conv2d(64, 32, kernel_size=5, stride=1, padding=2),
-            nn.BatchNorm2d(32),
+            nn.Conv1d(64, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm1d(32),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.MaxPool1d(kernel_size=2, stride=2)
         )
-        self.fc1 = nn.Linear(512, 32)  # x_ y_ 和你输入的矩阵有关系
+        self.fc1 = nn.Linear(256, 32)  # x_ y_ 和你输入的矩阵有关系
 
         self.rnn = nn.LSTM(  # if use nn.RNN(), it hardly learns
             input_size=self.input_size,  # 输入向量的长度
@@ -53,8 +53,8 @@ class RCNN(nn.Module):
             batch_first=True  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
         self.out = nn.Sequential(
-            nn.Linear(128, 64),
-            nn.Linear(64, 6)
+            nn.Linear(128, 24),
+            nn.Linear(24, 6)
 
         )
 
@@ -71,8 +71,8 @@ class RCNN(nn.Module):
             tmp_x = x[i][0]
             length = tmp_x.shape[-1] // self.Resampling
             for j in range(length):
-                tmp_split = tmp_x[:, self.Resampling * j:(j + 1) * self.Resampling]
-                tmp_split = torch.reshape(tmp_split, (1, 1, 32, self.Resampling))
+                tmp_split = tmp_x[self.Resampling * j:(j + 1) * self.Resampling]
+                tmp_split = torch.reshape(tmp_split, (1, 1, self.Resampling))
                 tmx = self.layer1(tmp_split)
                 tmx = self.layer2(tmx)
                 tmx = self.layer3(tmx)

@@ -84,24 +84,33 @@ class PdfProcess:
                      data_split_length[i] == epoch]  # 睡眠的状态,
             time = [x for i, x in enumerate(label_info['Time [hh:mm:ss]'].tolist()) if
                     data_split_length[i] == epoch]  # 睡眠的时间
+            location = [x for i, x in enumerate(label_info['Location'].tolist()) if data_split_length[i] == epoch]
 
             # 需要将标准的时间会序列中的序号
 
             data = read_edf_raw(path_data)  # 读取原始的数据，此时的数据可能比较占用内存，内存占用大概为2GB
             data.resample(downsampling, npad='auto')  # 对数据进行降采样，降低对于显卡的占用大小
+            channel_list = get_channels_names(data)  # 获得数据的信道列表
             sampling = get_sampling_hz(data)  # 获得数据的采样频率
             if sampling != downsampling:
                 assert "采样出错！"
             start_time_absolute = data.annotations.orig_time.strftime("%H:%M:%S")  # 获得文件的绝对起始时间
-            for s, t in tqdm(zip(state, time)):
+            for s, t, l in tqdm(zip(state, time, location)):
                 start_time_file = cal_time_index(start_time_absolute, t)  # 计算相对稳健的起始时间
                 # 获得了数据的切片
                 split_data, _ = data[:, start_time_file * downsampling: (start_time_file + epoch) * downsampling]
                 # 设置数据的存储目录
-                file_name = os.path.basename(path_data).split('.')[0]
-                name = "{}_{}_{}_{}.{}".format(uuid.uuid1(), file_name, t, s, "npy")  # 命名规则：uuid+文件+时间+状态+后缀
-                save_split_data_path = os.path.join(sleep_state_path[s], name)  # 完整的路基表示
-                save_numpy_info(split_data, save_split_data_path)  # 写入到本地的磁盘中
+                if l not in channel_list:
+                    # 存在不存在的情况，这个情况比较特殊；可能是数据集存在问题
+                    continue
+                else:
+                    index_of_channel = channel_list.index(l)  # 在该数据列表中的序号
+                    split_data = split_data[index_of_channel]
+                    file_name = os.path.basename(path_data).split('.')[0]
+                    name = "{}_{}_{}_{}_ch_{}.{}".format(uuid.uuid1(), file_name, t, s, l,
+                                                         "npy")  # 命名规则：uuid+文件+时间+状态+发生的信道+后缀
+                    save_split_data_path = os.path.join(sleep_state_path[s], name)  # 完整的路基表示
+                    save_numpy_info(split_data, save_split_data_path)  # 写入到本地的磁盘中
             print("Processing finished.")
 
     def create_data_set(self, save_dir="../config/"):
