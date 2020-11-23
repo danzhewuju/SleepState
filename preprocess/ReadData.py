@@ -110,7 +110,8 @@ class PdfProcess:
                     name = "{}_{}_{}_{}_ch_{}.{}".format(uuid.uuid1(), file_name, t, s, l,
                                                          "npy")  # 命名规则：uuid+文件+时间+状态+发生的信道+后缀
                     save_split_data_path = os.path.join(sleep_state_path[s], name)  # 完整的路基表示
-                    save_numpy_info(split_data, save_split_data_path)  # 写入到本地的磁盘中
+                    if split_data.shape[-1] == epoch * downsampling:  # 需要严格保存有30s的数据，否则后面会出现长度不一致的问题，影响训练
+                        save_numpy_info(split_data, save_split_data_path)  # 写入到本地的磁盘中
             print("Processing finished.")
 
     def create_data_set(self, save_dir="../config/"):
