@@ -1,4 +1,4 @@
-#项目说明
+# 项目说明
 ## 数据集
 项目使用的数据集来自于：公开数据集
 利用深度学习的框架，来完成睡眠的分类的任务；
@@ -54,6 +54,6 @@ pip 安装方法：pip install -U https://api.github.com/repos/mne-tools/mne-pyt
         4. 测试结果会自动保存到./log/log.txt 里面
 
 ## 实验结果
-
+Accuracy: 71.80%
 
 
