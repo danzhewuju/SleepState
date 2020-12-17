@@ -22,7 +22,8 @@ from util.seeg_utils import *
 
 
 class PdfProcess:
-    def create_split_data(self, save_dir='../dataset/preprocessedData', epoch=30, downsampling=128):
+    def create_split_data(self, save_dir='../dataset/preprocessedData', epoch=30, downsampling=128, highPass=0,
+                          lowPass=30):
         """
         :param downsampling: 下采样的频率
         :param save_dir: 切分的数据集存放的位置 默认位置：../preprocessedData
@@ -89,7 +90,7 @@ class PdfProcess:
             # 需要将标准的时间会序列中的序号
 
             data = read_edf_raw(path_data)  # 读取原始的数据，此时的数据可能比较占用内存，内存占用大概为2GB
-            data = filter_hz(data, 0, 30)  # 选择滤波范围
+            data = filter_hz(data, highPass, lowPass)  # 选择滤波范围
             data.resample(downsampling, npad='auto')  # 对数据进行降采样，降低对于显卡的占用大小
             channel_list = get_channels_names(data)  # 获得数据的信道列表
             sampling = get_sampling_hz(data)  # 获得数据的采样频率
