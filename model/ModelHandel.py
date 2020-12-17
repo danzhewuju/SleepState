@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 from data_util import MyData
 from myModel import RCNN
-from util.util_file import IndicatorCalculation
+from example.util_file import IndicatorCalculation
 
 
 class ModelHandel:
@@ -125,7 +125,7 @@ class ModelHandel:
                     res_tmp = [1 if pred_y[i] == b_y[i] else 0 for i in range(len(b_y))]
                     acc_train += res_tmp
                     loss_train.append(loss.data.cpu())
-                    if step % 20 == 0:
+                    if step % 10 == 0:
                         acc_test, loss_test = [], []
                         for x_test, label_test in next(mydata.next_batch_val_data(transform=None)):
                             # x_test = linear_matrix_normalization(x_test)

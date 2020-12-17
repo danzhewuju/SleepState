@@ -8,7 +8,7 @@ import pandas as pd
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 
 sys.path.append('../')
-from util.util_file import matrix_normalization
+from example.util_file import matrix_normalization
 import torch
 
 
